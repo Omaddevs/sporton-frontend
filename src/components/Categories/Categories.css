@@ -1,0 +1,162 @@
+.categories-section {
+  padding: 20px 0 12px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 0 24px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.see-all-btn {
+  background: #f4fde0;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4a7000;
+  cursor: pointer;
+  padding: 5px 12px;
+  border-radius: 20px;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.see-all-btn:hover {
+  background: #96E20C;
+  color: #1a2e00;
+  transform: scale(1.04);
+}
+
+/* Outer wrapper: clips the right fade but does NOT hide left padding */
+.categories-scroll-wrap {
+  position: relative;
+}
+
+/* Right side fade — hints more items */
+.categories-scroll-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 56px;
+  height: 100%;
+  background: linear-gradient(to right, transparent, #f5f9ff 88%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Scroll list — left edge = 24px, same as "Kategoriyalar" title */
+.categories-list {
+  display: flex;
+  gap: 14px;
+  margin-left: 25px;
+  overflow-x: auto;
+  /* left padding aligns with title; extra right padding shows last item before fade */
+  padding: 4px 60px 14px 24px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+
+.categories-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* Each item */
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  transition: transform 0.2s;
+}
+
+.category-item:hover {
+  transform: translateY(-3px);
+}
+
+.category-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background: #eef6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0078FF;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  border: 2px solid transparent;
+}
+
+.category-generic-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 14px;
+  background: currentColor;
+  color: #fff;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  user-select: none;
+}
+
+.category-icon-wrap svg {
+  width: 32px;
+  height: 32px;
+}
+
+.category-item:hover .category-icon-wrap {
+  background: #dbeffe;
+  box-shadow: 0 4px 14px rgba(0, 120, 255, 0.18);
+}
+
+.category-item.active .category-icon-wrap {
+  background: #0078FF;
+  color: #fff;
+  box-shadow: 0 8px 22px rgba(0, 120, 255, 0.38);
+  border-color: transparent;
+}
+
+.category-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.category-item.active .category-name {
+  color: #0078FF;
+  font-weight: 700;
+}
+
+/* Skeleton loading */
+@keyframes shimmer {
+  0%   { background-position: -200px 0; }
+  100% { background-position:  200px 0; }
+}
+.category-skeleton {
+  width: 72px;
+  height: 95px;
+  border-radius: 22px;
+  background: linear-gradient(90deg, #f0f4f8 25%, #e8f0f8 50%, #f0f4f8 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.2s infinite linear;
+  flex-shrink: 0;
+}
