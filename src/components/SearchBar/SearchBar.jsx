@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Search, SlidersHorizontal, X, History, ChevronRight, RotateCcw } from 'lucide-react';
 import './SearchBar.css';
+
+const SEARCH_HISTORY_KEY = 'sporton_search_history_v1';
+const MAX_HISTORY = 7;
 
 export default function SearchBar({
   searchValue = '',
@@ -9,6 +12,7 @@ export default function SearchBar({
   regions = [],
   districts = [],
   sports = [],
+  searchSuggestions = [],
   filters = {
     region: '',
     district: '',
@@ -22,11 +26,44 @@ export default function SearchBar({
 } = {}) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [historyItems, setHistoryItems] = useState([]);
   const wrapRef = useRef(null);
+  const searchWrapRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(SEARCH_HISTORY_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(parsed)) setHistoryItems(parsed.filter((v) => typeof v === 'string' && v.trim()));
+    } catch {}
+  }, []);
+
+  const persistHistory = (next) => {
+    setHistoryItems(next);
+    try {
+      localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(next));
+    } catch {}
+  };
+
+  const pushHistory = (query) => {
+    const q = (query || '').trim();
+    if (!q) return;
+    const next = [q, ...historyItems.filter((v) => v.toLowerCase() !== q.toLowerCase())].slice(0, MAX_HISTORY);
+    persistHistory(next);
+  };
+
+  const applySearch = (query, save = true) => {
+    const q = (query || '').trim();
+    onSearchValueChange?.(query);
+    if (save && q) pushHistory(q);
+    setShowHistory(false);
+  };
 
   useEffect(() => {
     const handler = (e) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+      if (searchWrapRef.current && !searchWrapRef.current.contains(e.target)) setShowHistory(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -71,8 +108,19 @@ export default function SearchBar({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [open]);
 
+  const q = (searchValue || '').trim().toLowerCase();
+  const matchedSuggestions = q
+    ? searchSuggestions
+        .filter((v) => String(v || '').toLowerCase().includes(q))
+        .slice(0, 7)
+    : [];
+
+  const listTitle = q ? 'Search suggestions' : 'Recent searches';
+  const listItems = q ? matchedSuggestions : historyItems;
+
   return (
     <div className="searchbar-wrap">
+      <div className="searchbar-input-wrap" ref={searchWrapRef}>
       <div className="searchbar-input">
         <Search size={18} className="search-icon" />
         <input
@@ -80,7 +128,64 @@ export default function SearchBar({
           placeholder={t('search_placeholder')}
           value={searchValue}
           onChange={(e) => onSearchValueChange?.(e.target.value)}
+          onFocus={() => setShowHistory(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              applySearch(searchValue, true);
+            }
+          }}
         />
+      </div>
+      {showHistory && (
+        <div className="search-history-popover">
+          <div className="search-history-head">
+            <span>{listTitle}</span>
+          </div>
+          <div className="search-history-list">
+            {listItems.map((item) => (
+              <button
+                type="button"
+                key={item}
+                className="search-history-item"
+                onClick={() => {
+                  applySearch(item, true);
+                }}
+              >
+                <span className="search-history-item-left">
+                  <History size={15} />
+                  <span>{item}</span>
+                </span>
+                <ChevronRight size={16} />
+              </button>
+            ))}
+            {listItems.length === 0 && (
+              <div className="search-history-empty">No suggestions yet</div>
+            )}
+          </div>
+          <div className="search-history-actions">
+            <button
+              type="button"
+              className="search-history-clear"
+              onClick={() => persistHistory([])}
+              disabled={historyItems.length === 0}
+            >
+              <RotateCcw size={15} />
+              Clear all
+            </button>
+            <button
+              type="button"
+              className="search-history-filter-cta"
+              onClick={() => {
+                setShowHistory(false);
+                setOpen(true);
+              }}
+            >
+              Filters
+              <ChevronRight size={15} />
+            </button>
+          </div>
+        </div>
+      )}
       </div>
 
       <div className="filter-wrap" ref={wrapRef}>

@@ -27,6 +27,11 @@ export default function Home({ gyms, toggleLike, onNavigate }) {
 
   const regions = Array.from(new Set((gyms || []).map((g) => g.region))).filter(Boolean).sort();
   const sports = Array.from(new Set((gyms || []).flatMap((g) => g.sports || []))).sort();
+  const searchSuggestions = Array.from(
+    new Set(
+      (gyms || []).flatMap((g) => [g.name, g.district]).filter(Boolean)
+    )
+  );
 
   const availableDistricts = Array.from(
     new Set(
@@ -94,6 +99,7 @@ export default function Home({ gyms, toggleLike, onNavigate }) {
         regions={regions}
         districts={availableDistricts}
         sports={sports}
+        searchSuggestions={searchSuggestions}
         filters={filters}
         onFiltersChange={setFilters}
       />

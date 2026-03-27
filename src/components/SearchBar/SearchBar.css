@@ -22,6 +22,11 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
+.searchbar-input-wrap {
+  flex: 1;
+  position: relative;
+}
+
 .searchbar-input input {
   border: none;
   outline: none;
@@ -39,6 +44,118 @@
 .search-icon {
   color: #bdbdbd;
   flex-shrink: 0;
+}
+
+.search-history-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1.5px solid #e5edf7;
+  border-radius: 18px;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.14);
+  z-index: 1190;
+  padding: 10px;
+}
+
+.search-history-head {
+  font-size: 12px;
+  font-weight: 800;
+  color: #94a3b8;
+  padding: 4px 6px 8px;
+}
+
+.search-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.search-history-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: none;
+  background: #f8fbff;
+  border-radius: 12px;
+  padding: 12px 10px;
+  color: #1f2937;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.search-history-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.search-history-item-left span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-history-item svg {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.search-history-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 4px 2px;
+}
+
+.search-history-clear {
+  border: none;
+  background: transparent;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.search-history-clear:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.search-history-filter-cta {
+  border: none;
+  background: linear-gradient(135deg, #96E20C, #7bc400);
+  color: #1a2e00;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(150, 226, 12, 0.45);
+}
+
+.search-history-empty {
+  font-size: 13px;
+  font-weight: 600;
+  color: #94a3b8;
+  padding: 14px 8px 10px;
 }
 
 .filter-btn {

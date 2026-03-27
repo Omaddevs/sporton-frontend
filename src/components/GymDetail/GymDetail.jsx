@@ -4,7 +4,7 @@ import {
   ArrowLeft, Heart, Share2, Star, MapPin, Phone,
   Clock, Droplets, Car, Wifi, Lock, Wind,
   Activity, Dumbbell, Flame, Waves, Coffee,
-  ChevronRight, ChevronLeft, CheckCircle2, Image, Eye,
+  ChevronRight, ChevronLeft, CheckCircle2, Image, Eye, Instagram,
 } from 'lucide-react';
 import { apiFetch, getUser } from '../../utils/api';
 import './GymDetail.css';
@@ -22,6 +22,17 @@ function YandexLogo({ size = 22 }) {
         d="M9 12c.7-1.9 1.7-3.5 3-5 1.3 1.5 2.3 3.1 3 5-1.1.8-2.1 1.2-3 1.2S10.1 12.8 9 12z"
         fill="#fff"
         opacity="0.85"
+      />
+    </svg>
+  );
+}
+
+function TelegramIcon({ size = 20 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="#229ED9"
+        d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"
       />
     </svg>
   );
@@ -277,6 +288,8 @@ export default function GymDetail({ gym, onClose, onToggleLike }) {
   };
 
   const telHref = gymData?.phone ? `tel:${gymData.phone.replace(/\s/g,'')}` : null;
+  const telegramUrl = (gymData?.telegramUrl || '').trim();
+  const instagramUrl = (gymData?.instagramUrl || '').trim();
   const lat = Number(gymData?.lat ?? 0);
   const lng = Number(gymData?.lng ?? 0);
   const addressQuery = gymData?.address || gymData?.district || '';
@@ -546,44 +559,40 @@ export default function GymDetail({ gym, onClose, onToggleLike }) {
             </div>
           )}
 
-          <div style={{ height: 110 }} />
         </div>
 
         {/* ── Footer ── */}
         <div className="gd-footer">
           <div className="gd-footer-info">
-            <span className="gd-footer-name">{gym.name}</span>
-            <span className="gd-footer-district">{gym.district}</span>
+            <span className="gd-footer-name">{gymData.name}</span>
+            <span className="gd-footer-district">{gymData.district}</span>
           </div>
-          <div className="gd-call-actions">
-            <a
-              className={`gd-call-logo-btn gd-call-logo-btn-yandex ${telHref ? '' : 'disabled'}`}
-              href={telHref || undefined}
-              target="_self"
-              aria-disabled={!telHref}
-              onClick={(e) => {
-                if (!telHref) e.preventDefault();
-              }}
-              rel="noreferrer"
-            >
-              <YandexLogo size={20} />
-              <span>{t('call_now')}</span>
-            </a>
-
-            <a
-              className={`gd-call-logo-btn gd-call-logo-btn-google ${telHref ? '' : 'disabled'}`}
-              href={telHref || undefined}
-              target="_self"
-              aria-disabled={!telHref}
-              onClick={(e) => {
-                if (!telHref) e.preventDefault();
-              }}
-              rel="noreferrer"
-            >
-              <GoogleLogo size={20} />
-              <span>{t('call_now')}</span>
-            </a>
-          </div>
+          {(telegramUrl || instagramUrl) && (
+            <div className="gd-call-actions">
+              {telegramUrl && (
+                <a
+                  className="gd-call-logo-btn gd-call-logo-btn-telegram"
+                  href={telegramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <TelegramIcon size={20} />
+                  <span>{t('social_telegram')}</span>
+                </a>
+              )}
+              {instagramUrl && (
+                <a
+                  className="gd-call-logo-btn gd-call-logo-btn-instagram"
+                  href={instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Instagram size={20} strokeWidth={2} className="gd-instagram-footer-icon" />
+                  <span>{t('social_instagram')}</span>
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
       </div>
