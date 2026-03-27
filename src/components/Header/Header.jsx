@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Bell } from 'lucide-react';
+import logoImg from '../../logo-image/logo.png';
 import './Header.css';
 import NotificationsPopup from '../Notifications/NotificationsPopup';
 
@@ -83,14 +84,7 @@ export default function Header() {
         <div className="header-top">
           <div className="header-brand">
             <div className="brand-logo">
-              <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
-                <rect width="28" height="28" rx="8" fill="#0078FF"/>
-                <rect x="3" y="12" width="4.5" height="4.5" rx="1.5" fill="white" opacity="0.7"/>
-                <rect x="20.5" y="12" width="4.5" height="4.5" rx="1.5" fill="white" opacity="0.7"/>
-                <rect x="7" y="9.5" width="3.5" height="9" rx="1.75" fill="white" opacity="0.9"/>
-                <rect x="17.5" y="9.5" width="3.5" height="9" rx="1.75" fill="white" opacity="0.9"/>
-                <rect x="10.5" y="12.75" width="7" height="2.5" rx="1.25" fill="white"/>
-              </svg>
+              <img src={logoImg} alt="SportON Logo" width="28" height="28" style={{ objectFit: 'contain' }} />
             </div>
             <span className="brand-name">SportON</span>
           </div>

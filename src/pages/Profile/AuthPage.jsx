@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Eye, EyeOff, User, Lock, ArrowRight } from 'lucide-react';
+import logoImg from '../../logo-image/logo.png';
 import './Auth.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://sporton-api.onrender.com';
@@ -61,16 +62,9 @@ export default function AuthPage({ onLogin }) {
 
   return (
     <div className="auth-page">
-      {/* Hero */}
       <div className="auth-hero">
         <div className="auth-hero-icon">
-          <svg viewBox="0 0 64 64" fill="none" width="52" height="52">
-            <rect x="8" y="26" width="10" height="10" rx="3" fill="white" opacity="0.3" />
-            <rect x="46" y="26" width="10" height="10" rx="3" fill="white" opacity="0.3" />
-            <rect x="17" y="20" width="8" height="24" rx="3.5" fill="white" opacity="0.5" />
-            <rect x="39" y="20" width="8" height="24" rx="3.5" fill="white" opacity="0.5" />
-            <rect x="25" y="28" width="14" height="6" rx="3" fill="white" opacity="0.85" />
-          </svg>
+          <img src={logoImg} alt="SportON" width="60" height="60" style={{ objectFit: 'contain' }} />
         </div>
         <h1 className="auth-hero-title">SportON</h1>
         <p className="auth-hero-sub">O'zbekistondagi sport zallari</p>
