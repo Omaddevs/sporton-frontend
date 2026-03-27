@@ -12,6 +12,7 @@ function formatPrice(price) {
 export default function GymList({ gyms = [], toggleLike }) {
   const { t } = useTranslation();
   const [selected, setSelected] = useState(null);
+  const [brokenImages, setBrokenImages] = useState({});
 
   const handleToggleLike = (e, id) => {
     e.stopPropagation();
@@ -27,7 +28,9 @@ export default function GymList({ gyms = [], toggleLike }) {
         </div>
 
         <div className="gym-grid">
-          {gyms.map((gym) => (
+          {gyms.map((gym) => {
+            const imageUrl = brokenImages[gym.id] ? null : getGymImageUrl(gym);
+            return (
             <div
               key={gym.id}
               className="gym-card"
@@ -35,11 +38,13 @@ export default function GymList({ gyms = [], toggleLike }) {
             >
               {/* Card visual */}
               <div className="gym-card-visual" style={{ background: gym.gradient || '#0f172a' }}>
-                {getGymImageUrl(gym) && (
+                {imageUrl && (
                   <img 
-                    src={getGymImageUrl(gym)} 
+                    src={imageUrl} 
                     alt={gym.name} 
-                    className="gym-card-bg-img" 
+                    className="gym-card-bg-img"
+                    loading="lazy"
+                    onError={() => setBrokenImages((prev) => ({ ...prev, [gym.id]: true }))}
                   />
                 )}
                 
@@ -68,7 +73,7 @@ export default function GymList({ gyms = [], toggleLike }) {
                   </span>
                 </div>
 
-                {!getGymImageUrl(gym) && (
+                {!imageUrl && (
                   <div className="gym-visual-icon">
                     <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <rect x="6" y="34" width="12" height="12" rx="4" fill="white" opacity="0.25"/>
@@ -104,7 +109,8 @@ export default function GymList({ gyms = [], toggleLike }) {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

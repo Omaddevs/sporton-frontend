@@ -102,6 +102,7 @@ function GalleryHero({ gym, onClose, liked, onToggleLike }) {
   const [idx, setIdx] = useState(0);
   const [dir, setDir] = useState(null);
   const [animating, setAnimating] = useState(false);
+  const [brokenSlides, setBrokenSlides] = useState({});
 
   const go = useCallback((next) => {
     if (animating) return;
@@ -125,12 +126,13 @@ function GalleryHero({ gym, onClose, liked, onToggleLike }) {
         style={{ background: slides[idx].bg }}
         key={idx}
       >
-        {slides[idx].src && (
+        {slides[idx].src && !brokenSlides[slides[idx].src] && (
           <img
             className="gd-slide-img"
             src={slides[idx].src}
             alt={slides[idx].label}
             draggable={false}
+            onError={() => setBrokenSlides((prev) => ({ ...prev, [slides[idx].src]: true }))}
           />
         )}
         <div className="gd-hero-overlay" />

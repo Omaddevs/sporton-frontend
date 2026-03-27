@@ -70,6 +70,7 @@ export default function Explore({ gyms = [], toggleLike }) {
   const [activeGym, setActiveGym] = useState(null);
   const [detailGym, setDetailGym] = useState(null);
   const [search, setSearch] = useState('');
+  const [brokenThumbs, setBrokenThumbs] = useState({});
   const panelOpen = true; // Always open (no hamburger collapse)
   const listRef = useRef(null);
 
@@ -182,7 +183,7 @@ export default function Explore({ gyms = [], toggleLike }) {
             </div>
           )}
           {filtered.map((gym) => {
-            const thumbSrc = getGymImageUrl(gym);
+            const thumbSrc = brokenThumbs[gym.id] ? null : getGymImageUrl(gym);
             return (
             <div
               id={`gym-item-${gym.id}`}
@@ -197,6 +198,7 @@ export default function Explore({ gyms = [], toggleLike }) {
                     alt=""
                     className="panel-gym-thumb-img"
                     loading="lazy"
+                    onError={() => setBrokenThumbs((prev) => ({ ...prev, [gym.id]: true }))}
                   />
                 ) : (
                   <svg viewBox="0 0 40 40" fill="none" width="22" height="22" aria-hidden>
