@@ -265,24 +265,13 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
         method: 'POST',
         body: JSON.stringify({ score: myScore, comment: myComment }),
       });
-      setGymData(prev => ({
-        ...prev,
-        rating: res.newRating,
-        ratingCount: res.ratingCount,
-        reviewsCount: res.ratingCount,
-        ratingPercent: res.ratingPercent,
-        reviews: [
-          {
-            id: Date.now(),
-            username: user?.username,
-            fullName: user?.full_name || user?.username,
-            score: myScore,
-            comment: myComment,
-            date: new Date().toLocaleDateString('uz-UZ'),
-          },
-          ...(prev.reviews || []).filter(r => r.username !== user?.username),
-        ],
-      }));
+      const savedScore = res.yourScore ?? myScore;
+      const savedComment = res.yourComment != null ? String(res.yourComment) : myComment;
+      setMyScore(savedScore);
+      setMyComment(savedComment);
+
+      const detail = await apiFetch(`/api/gyms/${gym.id}/`);
+      setGymData((prev) => ({ ...prev, ...detail }));
       setShowCommentBox(false);
     } catch (e) {
       alert(e?.message || 'Xato yuz berdi');
@@ -323,7 +312,11 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
       className={`gd-backdrop ${visible ? 'visible' : ''} ${closing ? 'closing' : ''}`}
       onClick={(e) => e.target === e.currentTarget && handleClose()}
     >
-      <div className={`gd-sheet ${visible ? 'visible' : ''} ${closing ? 'closing' : ''}`}>
+      <div
+        className={`gd-sheet ${visible ? 'visible' : ''} ${closing ? 'closing' : ''}`}
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
 
         {/* ── Gallery Hero (topbar inside) ── */}
         <GalleryHero
@@ -448,11 +441,16 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
                 <div className="gd-stars">
                   {[1,2,3,4,5].map(star => (
                     <button
+                      type="button"
                       key={star}
                       className={`gd-star-btn ${star <= (hoverScore ?? myScore ?? 0) ? 'active' : ''}`}
                       onMouseEnter={() => setHoverScore(star)}
                       onMouseLeave={() => setHoverScore(null)}
-                      onClick={() => handleRate(star)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleRate(star);
+                      }}
                       aria-label={`${star} yulduz`}
                     >
                       <Star
@@ -465,9 +463,10 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
                 </div>
               </div>
             </div>
-            {myScore && myComment && !showCommentBox && (
+            {myScore && !showCommentBox && (
               <p className="gd-rating-your-score">
-                {'★'.repeat(myScore)}{'☆'.repeat(5 - myScore)} — "{myComment}"
+                {'★'.repeat(myScore)}{'☆'.repeat(5 - myScore)}
+                {myComment?.trim() ? ` — "${myComment.trim()}"` : ''}
               </p>
             )}
             {showCommentBox && (
@@ -481,10 +480,25 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
                   maxLength={500}
                 />
                 <div className="gd-comment-actions">
-                  <button className="gd-comment-cancel" onClick={() => setShowCommentBox(false)}>
+                  <button
+                    type="button"
+                    className="gd-comment-cancel"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowCommentBox(false);
+                    }}
+                  >
                     Bekor qilish
                   </button>
-                  <button className="gd-comment-submit" onClick={handleSubmitReview} disabled={ratingLoading}>
+                  <button
+                    type="button"
+                    className="gd-comment-submit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSubmitReview();
+                    }}
+                    disabled={ratingLoading}
+                  >
                     {ratingLoading ? 'Saqlanmoqda…' : 'Yuborish ✓'}
                   </button>
                 </div>
