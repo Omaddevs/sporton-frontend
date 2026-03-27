@@ -65,7 +65,7 @@ function formatPrice(p) {
   return new Intl.NumberFormat('uz-UZ').format(p);
 }
 
-export default function Explore({ gyms = [], toggleLike }) {
+export default function Explore({ gyms = [], toggleLike, onNavigate }) {
   const { t } = useTranslation();
   const [activeGym, setActiveGym] = useState(null);
   const [detailGym, setDetailGym] = useState(null);
@@ -253,6 +253,7 @@ export default function Explore({ gyms = [], toggleLike }) {
           gym={gyms.find((g) => g.id === detailGym.id) || detailGym}
           onClose={() => setDetailGym(null)}
           onToggleLike={handleToggleLike}
+          onRequireAuth={() => onNavigate?.('profile')}
         />
       )}
     </div>

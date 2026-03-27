@@ -7,6 +7,7 @@ import Profile from './pages/Profile/Profile';
 import BottomNav from './components/BottomNav/BottomNav';
 import Header from './components/Header/Header';
 import { gyms as initialGyms } from './data/gyms';
+import { apiFetch } from './utils/api';
 import './App.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://sporton-api.onrender.com';
@@ -36,19 +37,17 @@ export default function App() {
 
     async function loadGyms() {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/gyms/`, {
+        const data = await apiFetch('/api/gyms/', {
           signal: controller.signal,
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
         const items = Array.isArray(data?.items) ? data.items : [];
 
         setGyms((prev) => {
           const likedById = new Map((prev || []).map((g) => [g.id, g.liked]));
           return items.map((g) => ({
             ...g,
-            // Backend doesn't know about likes; keep existing liked state if present.
-            liked: likedById.get(g.id) ?? false,
+            // If backend returned liked true/false, use it! Otherwise fallback.
+            liked: g.liked ?? (likedById.get(g.id) ?? false),
           }));
         });
       } catch (e) {
@@ -64,10 +63,33 @@ export default function App() {
     };
   }, []);
 
-  const toggleLike = (id) => {
+  const toggleLike = async (id) => {
+    if (!user) {
+      setActivePage('profile');
+      return;
+    }
+
+    // Optimistik yondashuv (UI'ni tezda o'zgartirish)
     setGyms((prev) =>
       prev.map((g) => (g.id === id ? { ...g, liked: !g.liked } : g))
     );
+
+    try {
+      // Backendga bildirish
+      const data = await apiFetch(`/api/gyms/${id}/like/`, {
+        method: 'POST',
+      });
+      // Backend aniq holatni qaytaradi: data.liked
+      setGyms((prev) =>
+        prev.map((g) => (g.id === id ? { ...g, liked: data.liked } : g))
+      );
+    } catch (e) {
+      console.error('Like toggle failed:', e);
+      // Agar backendda xato bo'lsa, holatni orqaga qaytarish mumkin (ixtiyoriy)
+      setGyms((prev) =>
+        prev.map((g) => (g.id === id ? { ...g, liked: !g.liked } : g))
+      );
+    }
   };
 
   const handleLogin = (userData, token, refreshToken) => {
@@ -124,13 +146,13 @@ export default function App() {
               flexDirection: 'column',
             }}
           >
-            <Explore gyms={gyms} toggleLike={toggleLike} />
+            <Explore gyms={gyms} toggleLike={toggleLike} onNavigate={setActivePage} />
           </div>
         </>
       ) : activePage === 'home' ? (
         <Home gyms={gyms} toggleLike={toggleLike} onNavigate={setActivePage} />
       ) : activePage === 'favorite' ? (
-        <Favorites gyms={gyms} toggleLike={toggleLike} />
+        <Favorites gyms={gyms} toggleLike={toggleLike} onNavigate={setActivePage} />
       ) : activePage === 'profile' ? (
         <Profile
           user={user}

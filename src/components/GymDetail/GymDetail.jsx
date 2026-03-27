@@ -200,7 +200,7 @@ function GalleryHero({ gym, onClose, liked, onToggleLike }) {
   );
 }
 
-export default function GymDetail({ gym, onClose, onToggleLike }) {
+export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth }) {
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -236,12 +236,12 @@ export default function GymDetail({ gym, onClose, onToggleLike }) {
       document.body.style.overflow = '';
       cancelAnimationFrame(raf);
     };
-  }, [gym.id]);
+  }, [gym.id, user]);
 
   const handleRate = (score) => {
     const currentUser = getUser();
     if (!currentUser) {
-      alert('Baho berish uchun avval tizimga kiring!');
+      if (onRequireAuth) onRequireAuth();
       return;
     }
     setMyScore(score);

@@ -9,7 +9,7 @@ function formatPrice(price) {
   return new Intl.NumberFormat('uz-UZ').format(price);
 }
 
-export default function Favorites({ gyms = [], toggleLike }) {
+export default function Favorites({ gyms = [], toggleLike, onNavigate }) {
   const { t } = useTranslation();
   // Keep only id in state to avoid stale gym objects (images might load after click).
   const [selectedId, setSelectedId] = useState(null);
@@ -117,6 +117,7 @@ export default function Favorites({ gyms = [], toggleLike }) {
           gym={selectedGym}
           onClose={() => setSelectedId(null)}
           onToggleLike={(id) => toggleLike?.(id)}
+          onRequireAuth={() => onNavigate?.('profile')}
         />
       )}
     </div>

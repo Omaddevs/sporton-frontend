@@ -9,7 +9,7 @@ function formatPrice(price) {
   return new Intl.NumberFormat('uz-UZ').format(price);
 }
 
-export default function GymList({ gyms = [], toggleLike }) {
+export default function GymList({ gyms = [], toggleLike, onNavigate }) {
   const { t } = useTranslation();
   const [selected, setSelected] = useState(null);
   const [brokenImages, setBrokenImages] = useState({});
@@ -121,6 +121,7 @@ export default function GymList({ gyms = [], toggleLike }) {
           onToggleLike={(id) => {
             toggleLike?.(id);
           }}
+          onRequireAuth={() => onNavigate?.('profile')}
         />
       )}
     </>

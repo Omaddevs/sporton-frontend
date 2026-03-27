@@ -115,7 +115,7 @@ export default function Home({ gyms, toggleLike, onNavigate }) {
           }}
         />
         <PromoBannerCarousel banners={promoBanners} onNavigate={onNavigate} />
-        <GymList gyms={filteredGyms} toggleLike={toggleLike} />
+        <GymList gyms={filteredGyms} toggleLike={toggleLike} onNavigate={onNavigate} />
         <div className="bottom-spacer" />
       </div>
 
