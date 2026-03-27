@@ -138,13 +138,21 @@ function GalleryHero({ gym, onClose, liked, onToggleLike }) {
         key={idx}
       >
         {slides[idx].src && !brokenSlides[slides[idx].src] && (
-          <img
-            className="gd-slide-img"
-            src={slides[idx].src}
-            alt={slides[idx].label}
-            draggable={false}
-            onError={() => setBrokenSlides((prev) => ({ ...prev, [slides[idx].src]: true }))}
-          />
+          <>
+            <img
+              className="gd-slide-bg-blur"
+              src={slides[idx].src}
+              alt=""
+              aria-hidden
+            />
+            <img
+              className="gd-slide-img"
+              src={slides[idx].src}
+              alt={slides[idx].label}
+              draggable={false}
+              onError={() => setBrokenSlides((prev) => ({ ...prev, [slides[idx].src]: true }))}
+            />
+          </>
         )}
         <div className="gd-hero-overlay" />
       </div>
