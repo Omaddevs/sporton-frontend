@@ -84,25 +84,25 @@ export default function Header() {
         <div className="header-top">
           <div className="header-brand">
             <div className="brand-logo">
-              <img src={logoImg} alt="SportON Logo" width="28" height="28" style={{ objectFit: 'contain' }} />
+              <img src={logoImg} alt="SportON Logo" width="34" height="34" style={{ objectFit: 'contain' }} />
             </div>
-            <span className="brand-name">SportON</span>
+            {/* <span className="brand-name">SportON</span> */}
           </div>
 
           <div className="header-right">
             <button className="bell-btn" type="button" onClick={() => setShowNotifications(true)}>
-            <Bell size={19} strokeWidth={2} />
-            {unreadCount > 0 && <span className="bell-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>}
-          </button>
+              <Bell size={19} strokeWidth={2} />
+              {unreadCount > 0 && <span className="bell-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>}
+            </button>
+          </div>
         </div>
-      </div>
 
-      <NotificationsPopup
-        open={showNotifications}
-        onClose={handleClose}
-        onUnreadCountChange={setUnreadCount}
-      />
-    </header>
+        <NotificationsPopup
+          open={showNotifications}
+          onClose={handleClose}
+          onUnreadCountChange={setUnreadCount}
+        />
+      </header>
     </>
   );
 }
