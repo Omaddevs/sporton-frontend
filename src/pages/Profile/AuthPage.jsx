@@ -52,7 +52,7 @@ export default function AuthPage({ onLogin }) {
         throw new Error(msg);
       }
 
-      onLogin(data.user, data.access);
+      onLogin(data.user, data.access, data.refresh);
     } catch (e) {
       setError(e?.message || 'Tarmoq xatosi');
     } finally {

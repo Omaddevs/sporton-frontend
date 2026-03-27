@@ -269,12 +269,13 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
         ...prev,
         rating: res.newRating,
         ratingCount: res.ratingCount,
+        reviewsCount: res.ratingCount,
         ratingPercent: res.ratingPercent,
         reviews: [
           {
             id: Date.now(),
             username: user?.username,
-            fullName: user?.username,
+            fullName: user?.full_name || user?.username,
             score: myScore,
             comment: myComment,
             date: new Date().toLocaleDateString('uz-UZ'),
