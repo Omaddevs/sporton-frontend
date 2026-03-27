@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft, Heart, Share2, Star, MapPin, Phone,
@@ -316,7 +317,7 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
 
   const displayScore = hoverScore ?? myScore;
 
-  return (
+  return createPortal(
     <div
       className={`gd-backdrop ${visible ? 'visible' : ''} ${closing ? 'closing' : ''}`}
       onClick={(e) => e.target === e.currentTarget && handleClose()}
@@ -604,6 +605,7 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
