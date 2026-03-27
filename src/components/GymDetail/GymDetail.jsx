@@ -383,7 +383,7 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
               <div className="gd-stat-icon" style={{ background: '#fef3c7', color: '#92400e' }}>
                 <Eye size={17} />
               </div>
-              <span className="gd-stat-val">{gymData.reviewsCount}</span>
+              <span className="gd-stat-val">{gymData.viewsCount || 0}</span>
               <span className="gd-stat-lbl">Ko'rishlar</span>
             </div>
           </div>
