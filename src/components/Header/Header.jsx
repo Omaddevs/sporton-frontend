@@ -84,7 +84,11 @@ export default function Header() {
         <div className="header-top">
           <div className="header-brand">
             <div className="brand-logo">
-              <img src={logoImg} alt="SportON Logo" width="34" height="34" style={{ objectFit: 'contain' }} />
+              <img 
+                src={logoImg} 
+                alt="SportON Logo" 
+                style={{ height: '40px', width: 'auto', objectFit: 'contain', display: 'block' }} 
+              />
             </div>
             {/* <span className="brand-name">SportON</span> */}
           </div>

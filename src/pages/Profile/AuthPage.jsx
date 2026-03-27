@@ -64,7 +64,7 @@ export default function AuthPage({ onLogin }) {
     <div className="auth-page">
       <div className="auth-hero">
         <div className="auth-hero-icon">
-          <img src={logoImg} alt="SportON" width="60" height="60" style={{ objectFit: 'contain' }} />
+          <img src={logoImg} alt="SportON" style={{ height: '42px', width: 'auto', objectFit: 'contain', display: 'block' }} />
         </div>
         <h1 className="auth-hero-title">SportON</h1>
         <p className="auth-hero-sub">O'zbekistondagi sport zallari</p>
