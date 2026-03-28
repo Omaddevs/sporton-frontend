@@ -211,6 +211,9 @@ function GalleryHero({ gym, onClose, liked, onToggleLike }) {
 
 export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth }) {
   const { t } = useTranslation();
+  /** Har bir zal (post) alohida — barcha baho/sharhlar shu id orqali bog‘langan */
+  const postId = gym?.id;
+
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
   const [gymData, setGymData] = useState(gym);
@@ -225,27 +228,57 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
     document.body.style.overflow = 'hidden';
     const raf = requestAnimationFrame(() => setVisible(true));
 
-    // Fetch live data and my rating
+    return () => {
+      document.body.style.overflow = '';
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (postId == null) return;
+    let cancelled = false;
+
+    setGymData(gym);
+    setMyScore(null);
+    setMyComment('');
+    setHoverScore(null);
+    setShowCommentBox(false);
+    setRatingLoading(false);
+
     const fetchData = async () => {
       try {
-        const data = await apiFetch(`/api/gyms/${gym.id}/`);
-        setGymData(prev => ({ ...prev, ...data }));
-      } catch {}
+        const data = await apiFetch(`/api/gyms/${postId}/`);
+        if (cancelled) return;
+        setGymData((prev) => ({ ...prev, ...data }));
+      } catch {
+        if (!cancelled) setGymData(gym);
+      }
       if (user) {
         try {
-          const r = await apiFetch(`/api/gyms/${gym.id}/rate/`);
-          setMyScore(r.yourScore);
-          setMyComment(r.yourComment || '');
-        } catch {}
+          const r = await apiFetch(`/api/gyms/${postId}/rate/`);
+          if (cancelled) return;
+          if (r.postId != null && r.postId !== postId) return;
+          setMyScore(r.yourScore ?? null);
+          setMyComment(typeof r.yourComment === 'string' ? r.yourComment : '');
+        } catch {
+          if (!cancelled) {
+            setMyScore(null);
+            setMyComment('');
+          }
+        }
       }
     };
     fetchData();
 
     return () => {
-      document.body.style.overflow = '';
-      cancelAnimationFrame(raf);
+      cancelled = true;
     };
-  }, [gym.id, user]);
+  }, [postId, user]);
+
+  useEffect(() => {
+    if (gym?.id !== postId) return;
+    setGymData((prev) => ({ ...prev, liked: gym.liked ?? prev?.liked }));
+  }, [gym?.liked, gym?.id, postId]);
 
   const handleRate = (score) => {
     const currentUser = getUser();
@@ -258,19 +291,26 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
   };
 
   const handleSubmitReview = async () => {
-    if (!myScore) return;
+    if (!myScore || postId == null) return;
     setRatingLoading(true);
     try {
-      const res = await apiFetch(`/api/gyms/${gym.id}/rate/`, {
+      const res = await apiFetch(`/api/gyms/${postId}/rate/`, {
         method: 'POST',
-        body: JSON.stringify({ score: myScore, comment: myComment }),
+        body: JSON.stringify({
+          postId,
+          score: myScore,
+          comment: myComment,
+        }),
       });
+      if (res.postId != null && res.postId !== postId) {
+        throw new Error('Javob boshqa zalga tegishli');
+      }
       const savedScore = res.yourScore ?? myScore;
       const savedComment = res.yourComment != null ? String(res.yourComment) : myComment;
       setMyScore(savedScore);
       setMyComment(savedComment);
 
-      const detail = await apiFetch(`/api/gyms/${gym.id}/`);
+      const detail = await apiFetch(`/api/gyms/${postId}/`);
       setGymData((prev) => ({ ...prev, ...detail }));
       setShowCommentBox(false);
     } catch (e) {
@@ -305,7 +345,9 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
       ? `https://yandex.com/maps/?ll=${lng},${lat}&z=12&l=map`
       : `https://yandex.com/maps/?text=${encodeURIComponent(addressQuery)}`);
 
-  const displayScore = hoverScore ?? myScore;
+  const reviewsForPost = (gymData.reviews || []).filter(
+    (r) => r.postId == null || Number(r.postId) === Number(postId),
+  );
 
   return createPortal(
     <div
@@ -320,10 +362,10 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
 
         {/* ── Gallery Hero (topbar inside) ── */}
         <GalleryHero
-          gym={gym}
+          gym={gymData}
           onClose={handleClose}
-          liked={gym.liked}
-          onToggleLike={() => onToggleLike(gym.id)}
+          liked={gymData.liked ?? gym.liked}
+          onToggleLike={() => onToggleLike(postId)}
         />
 
         {/* Status + Rating bar */}
@@ -472,12 +514,15 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
             {showCommentBox && (
               <div className="gd-comment-box">
                 <textarea
+                  key={`comment-${postId}`}
                   className="gd-comment-textarea"
                   placeholder="Sharh yozing (ixtiyoriy)..."
                   value={myComment}
-                  onChange={e => setMyComment(e.target.value)}
+                  onChange={(e) => setMyComment(e.target.value)}
                   rows={3}
                   maxLength={500}
+                  name={`gym-review-${postId}`}
+                  autoComplete="off"
                 />
                 <div className="gd-comment-actions">
                   <button
@@ -551,16 +596,16 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
             </div>
           </div>
 
-          {/* Sharhlar ro'yxati */}
-          {gymData.reviews && gymData.reviews.length > 0 && (
+          {/* Sharhlar ro'yxati — faqat shu zal (postId) uchun */}
+          {reviewsForPost.length > 0 && (
             <div className="gd-section">
               <h3 className="gd-section-title">
                 Sharhlar
-                <span className="gd-reviews-count-badge">{gymData.reviews.length}</span>
+                <span className="gd-reviews-count-badge">{reviewsForPost.length}</span>
               </h3>
               <div className="gd-reviews-list">
-                {gymData.reviews.map((r) => (
-                  <div key={r.id} className="gd-review-card">
+                {reviewsForPost.map((r) => (
+                  <div key={`${postId}-${r.id}`} className="gd-review-card">
                     <div className="gd-review-header">
                       <div className="gd-review-avatar">
                         {(r.fullName || r.username || '?')[0].toUpperCase()}

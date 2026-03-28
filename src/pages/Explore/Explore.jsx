@@ -74,10 +74,12 @@ export default function Explore({ gyms = [], toggleLike, onNavigate }) {
   const panelOpen = true; // Always open (no hamburger collapse)
   const listRef = useRef(null);
 
-  const filtered = gyms.filter((g) =>
-    g.name.toLowerCase().includes(search.toLowerCase()) ||
-    g.district.toLowerCase().includes(search.toLowerCase())
-  );
+  const q = search.toLowerCase();
+  const filtered = gyms.filter((g) => {
+    const name = (g.name || '').toLowerCase();
+    const district = (g.district || '').toLowerCase();
+    return name.includes(q) || district.includes(q);
+  });
 
   const handleSelectGym = (gym, collapsePanelOnSelect = false) => {
     setActiveGym(gym);
@@ -250,6 +252,7 @@ export default function Explore({ gyms = [], toggleLike, onNavigate }) {
       {/* Gym Detail Modal */}
       {detailGym && (
         <GymDetail
+          key={detailGym.id}
           gym={gyms.find((g) => g.id === detailGym.id) || detailGym}
           onClose={() => setDetailGym(null)}
           onToggleLike={handleToggleLike}

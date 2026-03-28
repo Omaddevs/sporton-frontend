@@ -116,6 +116,7 @@ export default function GymList({ gyms = [], toggleLike, onNavigate }) {
 
       {selected && (
         <GymDetail
+          key={selected.id}
           gym={gyms.find((g) => g.id === selected.id) || selected}
           onClose={() => setSelected(null)}
           onToggleLike={(id) => {

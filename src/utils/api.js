@@ -59,15 +59,15 @@ export async function apiFetch(path, opts = {}) {
 
   let res = await doRequest(token);
 
-  // 401 → try refresh once
+  // 401 → refresh; agar refresh bo‘lmasa, tokenni tozalab yana bir marta **token siz** so‘rash
+  // (ochiq endpointlar, masalan /api/gyms/, eskirgan JWT tufayli 401 bermasligi uchun).
   if (res.status === 401) {
     const newToken = await tryRefreshToken();
     if (newToken) {
-      // Retry with fresh token
       res = await doRequest(newToken);
     } else {
-      // Refresh failed — clear stale auth silently
       clearAuth();
+      res = await doRequest(null);
     }
   }
 

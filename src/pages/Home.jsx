@@ -60,9 +60,10 @@ export default function Home({ gyms, toggleLike, onNavigate }) {
 
   const normalizedSearch = searchValue.trim().toLowerCase();
   const filteredGyms = (gyms || []).filter((g) => {
+    const name = (g.name || '').toLowerCase();
     const matchesSearch =
       !normalizedSearch ||
-      g.name.toLowerCase().includes(normalizedSearch) ||
+      name.includes(normalizedSearch) ||
       (g.district || '').toLowerCase().includes(normalizedSearch) ||
       (g.sports || []).some((s) => String(s).toLowerCase().includes(normalizedSearch));
 

@@ -40,13 +40,24 @@ export default function App() {
         const data = await apiFetch('/api/gyms/', {
           signal: controller.signal,
         });
-        const items = Array.isArray(data?.items) ? data.items : [];
+        const items = Array.isArray(data?.items)
+          ? data.items
+          : Array.isArray(data)
+            ? data
+            : [];
 
         setGyms((prev) => {
+          if (!items.length) {
+            if (import.meta.env.DEV) {
+              console.warn(
+                '[SportON] /api/gyms/ bo‘sh — bazada zal yo‘q yoki javob noto‘g‘ri; demo ro‘yxat saqlanadi.'
+              );
+            }
+            return prev?.length ? prev : [];
+          }
           const likedById = new Map((prev || []).map((g) => [g.id, g.liked]));
           return items.map((g) => ({
             ...g,
-            // If backend returned liked true/false, use it! Otherwise fallback.
             liked: g.liked ?? (likedById.get(g.id) ?? false),
           }));
         });

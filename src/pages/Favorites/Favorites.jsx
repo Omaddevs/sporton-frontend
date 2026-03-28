@@ -114,6 +114,7 @@ export default function Favorites({ gyms = [], toggleLike, onNavigate }) {
 
       {selectedGym && (
         <GymDetail
+          key={selectedGym.id}
           gym={selectedGym}
           onClose={() => setSelectedId(null)}
           onToggleLike={(id) => toggleLike?.(id)}
