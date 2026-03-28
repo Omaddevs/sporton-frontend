@@ -221,6 +221,7 @@ export default function SearchBar({
                 </button>
               </div>
 
+            <div className="filter-body">
             <div className="filter-row">
               <div className="filter-label">Viloyat</div>
               <select
@@ -322,38 +323,41 @@ export default function SearchBar({
                 ))}
               </select>
             </div>
+            </div>
 
-            <div className="filter-actions">
-              <button
-                type="button"
-                className="filter-search-submit"
-                disabled={searchLoading}
-                aria-busy={searchLoading}
-                onClick={async () => {
-                  await onSearchClick?.();
-                  setOpen(false);
-                }}
-              >
-                {searchLoading ? 'Qidirilmoqda…' : 'Qidirish'}
-              </button>
-              <button
-                type="button"
-                className="filter-reset"
-                disabled={searchLoading}
-                onClick={() => {
-                  onFiltersChange?.({
-                    region: '',
-                    district: '',
-                    sport: '',
-                    priceBand: 'any',
-                    openNow: false,
-                    minRating: 0,
-                    minReviews: 0,
-                  });
-                }}
-              >
-                Tozalash
-              </button>
+            <div className="filter-footer">
+              <div className="filter-footer-actions">
+                <button
+                  type="button"
+                  className="filter-reset"
+                  disabled={searchLoading}
+                  onClick={() => {
+                    onFiltersChange?.({
+                      region: '',
+                      district: '',
+                      sport: '',
+                      priceBand: 'any',
+                      openNow: false,
+                      minRating: 0,
+                      minReviews: 0,
+                    });
+                  }}
+                >
+                  Tozalash
+                </button>
+                <button
+                  type="button"
+                  className="filter-search-submit"
+                  disabled={searchLoading}
+                  aria-busy={searchLoading}
+                  onClick={async () => {
+                    await onSearchClick?.();
+                    setOpen(false);
+                  }}
+                >
+                  {searchLoading ? 'Qidirilmoqda…' : 'Qidirish'}
+                </button>
+              </div>
             </div>
             </div>
           </div>
