@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Send, Building2 } from 'lucide-react';
+import { X, Building2 } from 'lucide-react';
 import './PostGymModal.css';
 
 export default function PostGymModal({ onClose }) {
@@ -22,7 +22,7 @@ export default function PostGymModal({ onClose }) {
   };
 
   const handleTelegram = () => {
-    window.open('https://t.me/sporton_admin', '_blank');
+    window.open('https://t.me/omadbek_egamberdiyev', '_blank');
     handleClose();
   };
 
