@@ -502,6 +502,8 @@
 }
 
 .gd-rating-section {
+  position: relative;
+  z-index: 2;
   border-radius: 18px;
   border: 1.5px solid #fef3c7;
   background: linear-gradient(135deg, #fffbeb 0%, #fefce8 100%);
@@ -510,6 +512,16 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.gd-rating-stars-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.gd-rating-form {
+  margin: 0;
+  width: 100%;
 }
 
 .gd-stars {
@@ -522,13 +534,19 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 2px;
-  border-radius: 6px;
-  transition: transform 0.12s;
+  padding: 4px;
+  border-radius: 8px;
+  transition: transform 0.12s, background 0.12s;
   line-height: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 1;
 }
-.gd-star-btn:hover { transform: scale(1.25); }
-.gd-star-btn:disabled { cursor: default; opacity: 0.7; }
+.gd-star-btn:hover { transform: scale(1.15); }
+.gd-star-btn.active {
+  background: rgba(245, 158, 11, 0.12);
+}
 
 
 .gd-rating-top {
@@ -598,6 +616,21 @@
   font-style: italic;
 }
 
+.gd-rating-login-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: #b45309;
+  margin: 4px 0 0;
+}
+
+.gd-comment-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 6px;
+}
+
 /* Comment box */
 .gd-comment-box {
   display: flex;
@@ -657,7 +690,7 @@
   transition: transform 0.15s, box-shadow 0.15s;
 }
 .gd-comment-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(245,158,11,0.45); }
-.gd-comment-submit:disabled { opacity: 0.65; transform: none; }
+.gd-comment-submit.is-loading { opacity: 0.88; }
 
 /* Reviews list */
 .gd-reviews-count-badge {

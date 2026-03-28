@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -7,7 +7,7 @@ import {
   Activity, Dumbbell, Flame, Waves, Coffee,
   ChevronRight, ChevronLeft, CheckCircle2, Image, Eye, Instagram,
 } from 'lucide-react';
-import { apiFetch, getUser } from '../../utils/api';
+import { apiFetch, getToken } from '../../utils/api';
 import './GymDetail.css';
 
 function YandexLogo({ size = 22 }) {
@@ -221,8 +221,9 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
   const [myComment, setMyComment] = useState('');
   const [hoverScore, setHoverScore] = useState(null);
   const [ratingLoading, setRatingLoading] = useState(false);
-  const [showCommentBox, setShowCommentBox] = useState(false);
-  const user = getUser();
+  const submitLockRef = useRef(false);
+
+  const isAuthed = Boolean(getToken());
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -242,8 +243,8 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
     setMyScore(null);
     setMyComment('');
     setHoverScore(null);
-    setShowCommentBox(false);
     setRatingLoading(false);
+    submitLockRef.current = false;
 
     const fetchData = async () => {
       try {
@@ -253,18 +254,17 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
       } catch {
         if (!cancelled) setGymData(gym);
       }
-      if (user) {
-        try {
-          const r = await apiFetch(`/api/gyms/${postId}/rate/`);
-          if (cancelled) return;
-          if (r.postId != null && r.postId !== postId) return;
-          setMyScore(r.yourScore ?? null);
-          setMyComment(typeof r.yourComment === 'string' ? r.yourComment : '');
-        } catch {
-          if (!cancelled) {
-            setMyScore(null);
-            setMyComment('');
-          }
+      if (!getToken()) return;
+      try {
+        const r = await apiFetch(`/api/gyms/${postId}/rate/`);
+        if (cancelled) return;
+        if (r.postId != null && r.postId !== postId) return;
+        setMyScore(r.yourScore ?? null);
+        setMyComment(typeof r.yourComment === 'string' ? r.yourComment : '');
+      } catch {
+        if (!cancelled) {
+          setMyScore(null);
+          setMyComment('');
         }
       }
     };
@@ -273,25 +273,30 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
     return () => {
       cancelled = true;
     };
-  }, [postId, user]);
+  }, [postId]);
 
   useEffect(() => {
     if (gym?.id !== postId) return;
     setGymData((prev) => ({ ...prev, liked: gym.liked ?? prev?.liked }));
   }, [gym?.liked, gym?.id, postId]);
 
-  const handleRate = (score) => {
-    const currentUser = getUser();
-    if (!currentUser) {
-      if (onRequireAuth) onRequireAuth();
+  const handleStarClick = (score) => {
+    if (!getToken()) {
+      onRequireAuth?.();
       return;
     }
     setMyScore(score);
-    setShowCommentBox(true);
   };
 
-  const handleSubmitReview = async () => {
-    if (!myScore || postId == null) return;
+  const handleSubmitReview = async (e) => {
+    e?.preventDefault?.();
+    e?.stopPropagation?.();
+    if (!myScore || postId == null) {
+      alert('Avval yulduzlardan baho tanlang.');
+      return;
+    }
+    if (submitLockRef.current || ratingLoading) return;
+    submitLockRef.current = true;
     setRatingLoading(true);
     try {
       const res = await apiFetch(`/api/gyms/${postId}/rate/`, {
@@ -312,11 +317,11 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
 
       const detail = await apiFetch(`/api/gyms/${postId}/`);
       setGymData((prev) => ({ ...prev, ...detail }));
-      setShowCommentBox(false);
-    } catch (e) {
-      alert(e?.message || 'Xato yuz berdi');
+    } catch (err) {
+      alert(err?.message || 'Xato yuz berdi');
     } finally {
       setRatingLoading(false);
+      submitLockRef.current = false;
     }
   };
 
@@ -465,7 +470,7 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
             </div>
           )}
 
-          {/* Rating + Sharh qoldirish */}
+          {/* Rating + Sharh — postId bo‘yicha alohida state; qayta renderda faqat postId o‘zgarganda reset */}
           <div className="gd-rating-section">
             <div className="gd-rating-top">
               <div className="gd-rating-summary">
@@ -478,76 +483,91 @@ export default function GymDetail({ gym, onClose, onToggleLike, onRequireAuth })
                   <span className="gd-rating-count">{gymData.ratingCount || 0} ta baho</span>
                 </div>
               </div>
-              <div>
+              <div className="gd-rating-stars-wrap">
                 <p className="gd-rating-label">{myScore ? 'Bahoyingiz:' : 'Baho bering:'}</p>
-                <div className="gd-stars">
-                  {[1,2,3,4,5].map(star => (
-                    <button
-                      type="button"
-                      key={star}
-                      className={`gd-star-btn ${star <= (hoverScore ?? myScore ?? 0) ? 'active' : ''}`}
-                      onMouseEnter={() => setHoverScore(star)}
-                      onMouseLeave={() => setHoverScore(null)}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleRate(star);
-                      }}
-                      aria-label={`${star} yulduz`}
-                    >
-                      <Star
-                        size={24}
-                        fill={star <= (hoverScore ?? myScore ?? 0) ? '#f59e0b' : 'none'}
-                        stroke={star <= (hoverScore ?? myScore ?? 0) ? '#f59e0b' : '#d1d5db'}
-                      />
-                    </button>
-                  ))}
+                <div className="gd-stars" role="group" aria-label="Baho">
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const active = star <= (hoverScore ?? myScore ?? 0);
+                    return (
+                      <button
+                        type="button"
+                        key={star}
+                        className={`gd-star-btn ${active ? 'active' : ''}`}
+                        onMouseEnter={() => setHoverScore(star)}
+                        onMouseLeave={() => setHoverScore(null)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleStarClick(star);
+                        }}
+                        aria-label={`${star} yulduz`}
+                        aria-pressed={active}
+                      >
+                        <Star
+                          size={24}
+                          fill={active ? '#f59e0b' : 'none'}
+                          stroke={active ? '#f59e0b' : '#d1d5db'}
+                        />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
-            {myScore && !showCommentBox && (
-              <p className="gd-rating-your-score">
-                {'★'.repeat(myScore)}{'☆'.repeat(5 - myScore)}
+
+            {myScore ? (
+              <p className="gd-rating-your-score" aria-live="polite">
+                {'★'.repeat(myScore)}
+                {'☆'.repeat(5 - myScore)}
                 {myComment?.trim() ? ` — "${myComment.trim()}"` : ''}
               </p>
-            )}
-            {showCommentBox && (
-              <div className="gd-comment-box">
-                <textarea
-                  key={`comment-${postId}`}
-                  className="gd-comment-textarea"
-                  placeholder="Sharh yozing (ixtiyoriy)..."
-                  value={myComment}
-                  onChange={(e) => setMyComment(e.target.value)}
-                  rows={3}
-                  maxLength={500}
-                  name={`gym-review-${postId}`}
-                  autoComplete="off"
-                />
-                <div className="gd-comment-actions">
-                  <button
-                    type="button"
-                    className="gd-comment-cancel"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowCommentBox(false);
-                    }}
-                  >
-                    Bekor qilish
-                  </button>
-                  <button
-                    type="button"
-                    className="gd-comment-submit"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSubmitReview();
-                    }}
-                    disabled={ratingLoading}
-                  >
-                    {ratingLoading ? 'Saqlanmoqda…' : 'Yuborish ✓'}
-                  </button>
+            ) : null}
+
+            {isAuthed ? (
+              <form
+                className="gd-rating-form"
+                onSubmit={handleSubmitReview}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="gd-comment-box">
+                  <label className="gd-comment-label" htmlFor={`gym-comment-${postId}`}>
+                    Sharh (ixtiyoriy)
+                  </label>
+                  <textarea
+                    id={`gym-comment-${postId}`}
+                    className="gd-comment-textarea"
+                    placeholder="Sharh yozing (ixtiyoriy)..."
+                    value={myComment}
+                    onChange={(e) => setMyComment(e.target.value)}
+                    rows={3}
+                    maxLength={500}
+                    name={`gym-review-${postId}`}
+                    autoComplete="off"
+                  />
+                  <div className="gd-comment-actions">
+                    <button
+                      type="button"
+                      className="gd-comment-cancel"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMyComment('');
+                      }}
+                    >
+                      Matnni tozalash
+                    </button>
+                    <button
+                      type="submit"
+                      className={`gd-comment-submit ${ratingLoading ? 'is-loading' : ''}`}
+                    >
+                      {ratingLoading ? 'Saqlanmoqda…' : 'Yuborish ✓'}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </form>
+            ) : (
+              <p className="gd-rating-login-hint">
+                Sharh va bahoni saqlash uchun profilinga kiring.
+              </p>
             )}
           </div>
 
