@@ -23,6 +23,8 @@ export default function SearchBar({
     minReviews: 0,
   },
   onFiltersChange,
+  onSearchClick,
+  searchLoading = false,
 } = {}) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -324,7 +326,20 @@ export default function SearchBar({
             <div className="filter-actions">
               <button
                 type="button"
+                className="filter-search-submit"
+                disabled={searchLoading}
+                aria-busy={searchLoading}
+                onClick={async () => {
+                  await onSearchClick?.();
+                  setOpen(false);
+                }}
+              >
+                {searchLoading ? 'Qidirilmoqda…' : 'Qidirish'}
+              </button>
+              <button
+                type="button"
                 className="filter-reset"
+                disabled={searchLoading}
                 onClick={() => {
                   onFiltersChange?.({
                     region: '',

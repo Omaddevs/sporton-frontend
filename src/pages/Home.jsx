@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header/Header';
 import SearchBar from '../components/SearchBar/SearchBar';
 import Categories from '../components/Categories/Categories';
@@ -6,9 +6,35 @@ import GymList from '../components/GymList/GymList';
 import PostGymModal from '../components/PostGymModal/PostGymModal';
 import PromoBannerCarousel from '../components/PromoBannerCarousel/PromoBannerCarousel';
 import { Plus } from 'lucide-react';
+import { apiFetch } from '../utils/api';
 import './Home.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://sporton-api.onrender.com';
+
+const EMPTY_FILTERS = {
+  region: '',
+  district: '',
+  sport: '',
+  priceBand: 'any',
+  openNow: false,
+  minRating: 0,
+  minReviews: 0,
+};
+
+function buildGymsQuery(searchValue, filters) {
+  const params = new URLSearchParams();
+  const q = (searchValue || '').trim();
+  if (q) params.set('q', q);
+  if (filters.region) params.set('region', filters.region);
+  if (filters.district) params.set('district', filters.district);
+  if (filters.sport) params.set('sport', filters.sport);
+  if (filters.openNow) params.set('openNow', 'true');
+  if (filters.priceBand && filters.priceBand !== 'any') params.set('priceBand', filters.priceBand);
+  if (filters.minRating > 0) params.set('minRating', String(filters.minRating));
+  if (filters.minReviews > 0) params.set('minReviews', String(filters.minReviews));
+  const qs = params.toString();
+  return qs ? `/api/gyms/?${qs}` : '/api/gyms/';
+}
 
 export default function Home({
   gyms,
@@ -22,15 +48,11 @@ export default function Home({
   const [promoBanners, setPromoBanners] = useState([]);
 
   const [searchValue, setSearchValue] = useState('');
-  const [filters, setFilters] = useState({
-    region: '',
-    district: '',
-    sport: '',
-    priceBand: 'any', // any | lt300 | 300-450 | gt450
-    openNow: false,
-    minRating: 0,
-    minReviews: 0,
-  });
+  const [filters, setFilters] = useState({ ...EMPTY_FILTERS });
+  /** null = ro‘yxat hali “Qidirish”siz, parentdan kelgan `gyms` ko‘rsatiladi */
+  const [homeGyms, setHomeGyms] = useState(null);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState(null);
 
   const regions = Array.from(new Set((gyms || []).map((g) => g.region))).filter(Boolean).sort();
   const sports = Array.from(new Set((gyms || []).flatMap((g) => g.sports || []))).sort();
@@ -65,38 +87,45 @@ export default function Home({
     return () => ac.abort();
   }, []);
 
-  const normalizedSearch = searchValue.trim().toLowerCase();
-  const filteredGyms = (gyms || []).filter((g) => {
-    const name = (g.name || '').toLowerCase();
-    const matchesSearch =
-      !normalizedSearch ||
-      name.includes(normalizedSearch) ||
-      (g.district || '').toLowerCase().includes(normalizedSearch) ||
-      (g.sports || []).some((s) => String(s).toLowerCase().includes(normalizedSearch));
+  const runGymSearch = useCallback(async () => {
+    setSearchLoading(true);
+    setSearchError(null);
+    try {
+      const path = buildGymsQuery(searchValue, filters);
+      const data = await apiFetch(path);
+      const items = Array.isArray(data?.items)
+        ? data.items
+        : Array.isArray(data)
+          ? data
+          : [];
+      const likedById = new Map((gyms || []).map((g) => [g.id, g.liked]));
+      setHomeGyms(
+        items.map((g) => ({
+          ...g,
+          liked: g.liked ?? (likedById.get(g.id) ?? false),
+        }))
+      );
+    } catch (e) {
+      setSearchError(e?.message || "Qidiruvda xato");
+      setHomeGyms([]);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, [searchValue, filters, gyms]);
 
-    const matchesRegion = !filters.region || g.region === filters.region;
-    const matchesDistrict = !filters.district || g.district === filters.district;
-    const matchesSport = !filters.sport || (g.sports || []).includes(filters.sport);
-    const matchesPrice =
-      filters.priceBand === 'any' ||
-      (filters.priceBand === 'lt300' && g.monthlyPrice < 300000) ||
-      (filters.priceBand === '300-450' && g.monthlyPrice >= 300000 && g.monthlyPrice <= 450000) ||
-      (filters.priceBand === 'gt450' && g.monthlyPrice > 450000);
-    const matchesOpenNow = !filters.openNow || g.isOpen === true;
-    const matchesMinRating = !filters.minRating || g.rating >= filters.minRating;
-    const matchesMinReviews = !filters.minReviews || g.reviewsCount >= filters.minReviews;
+  useEffect(() => {
+    setHomeGyms((prev) => {
+      if (prev === null) return prev;
+      if (!prev.length) return prev;
+      const byId = new Map((gyms || []).map((g) => [g.id, g]));
+      return prev.map((g) => {
+        const fresh = byId.get(g.id);
+        return fresh ? { ...g, liked: fresh.liked ?? g.liked } : g;
+      });
+    });
+  }, [gyms]);
 
-    return (
-      matchesSearch &&
-      matchesRegion &&
-      matchesDistrict &&
-      matchesSport &&
-      matchesPrice &&
-      matchesOpenNow &&
-      matchesMinRating &&
-      matchesMinReviews
-    );
-  });
+  const listGyms = homeGyms !== null ? homeGyms : gyms || [];
 
   return (
     <div className="home-page">
@@ -110,6 +139,8 @@ export default function Home({
         searchSuggestions={searchSuggestions}
         filters={filters}
         onFiltersChange={setFilters}
+        onSearchClick={runGymSearch}
+        searchLoading={searchLoading}
       />
       <div className="home-scroll">
         <Categories
@@ -124,11 +155,18 @@ export default function Home({
         />
         <PromoBannerCarousel banners={promoBanners} onNavigate={onNavigate} />
         <GymList
-          gyms={filteredGyms}
+          gyms={listGyms}
           allLoadedCount={(gyms || []).length}
           loading={gymsLoading}
-          error={gymsError}
-          onRetry={onRetryGyms}
+          error={gymsError || searchError}
+          onRetry={() => {
+            if (searchError) {
+              setSearchError(null);
+              runGymSearch();
+            } else {
+              onRetryGyms?.();
+            }
+          }}
           toggleLike={toggleLike}
           onNavigate={onNavigate}
         />

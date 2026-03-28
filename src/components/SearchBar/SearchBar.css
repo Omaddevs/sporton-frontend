@@ -279,8 +279,34 @@
 
 .filter-actions {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 6px;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.filter-search-submit {
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #0078ff, #005bcc);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(0, 120, 255, 0.35);
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.filter-search-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.filter-search-submit:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .filter-reset {
@@ -293,12 +319,18 @@
   font-weight: 800;
   font-size: 13px;
   cursor: pointer;
+  width: 100%;
 }
 
-.filter-reset:hover {
-  border-color: #0078FF;
-  color: #0078FF;
+.filter-reset:hover:not(:disabled) {
+  border-color: #0078ff;
+  color: #0078ff;
   background: #eef6ff;
+}
+
+.filter-reset:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 @media (max-width: 480px) {
@@ -334,10 +366,6 @@
   }
 
   .filter-actions {
-    justify-content: center;
-  }
-
-  .filter-reset {
-    width: 100%;
+    justify-content: stretch;
   }
 }
