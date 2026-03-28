@@ -21,6 +21,13 @@ button {
   font-family: inherit;
 }
 
-input {
+/*
+ * iOS Safari: computed font-size < 16px on focused text fields triggers automatic page zoom.
+ * Keep all text-like inputs, textareas, and selects at least 16px (also helps Android Chrome).
+ */
+textarea,
+select,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="image"]):not([type="hidden"]) {
   font-family: inherit;
+  font-size: 16px;
 }
