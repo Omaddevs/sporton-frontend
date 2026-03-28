@@ -22,7 +22,15 @@ import PostGymModal from '../../components/PostGymModal/PostGymModal';
 
 const TELEGRAM_HELP = 'https://t.me/sporton_admin';
 
-export default function ProfileView({ user, onLogout, gyms = [], onNavigate, onUpdateProfile }) {
+export default function ProfileView({
+  user,
+  onLogout,
+  gyms,
+  gymsLoading,
+  gymsError,
+  onNavigate,
+  onUpdateProfile,
+}) {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
@@ -32,8 +40,9 @@ export default function ProfileView({ user, onLogout, gyms = [], onNavigate, onU
   const { t, i18n } = useTranslation();
   const langSectionRef = useRef(null);
 
-  const likedCount = gyms.filter((g) => g.liked).length;
-  const gymTotal = gyms.length;
+  const list = Array.isArray(gyms) ? gyms : [];
+  const likedCount = gymsLoading ? null : list.filter((g) => g.liked).length;
+  const gymTotal = gymsLoading ? null : list.length;
 
   const displayName = user?.fullName || user?.username || user?.email || 'User';
   const initialsSource = user?.fullName?.trim() || user?.username || user?.email || 'U';
@@ -138,12 +147,16 @@ export default function ProfileView({ user, onLogout, gyms = [], onNavigate, onU
 
           <div className="profile-stats">
             <button type="button" className="stat-item stat-clickable" onClick={() => onNavigate?.('favorite')}>
-              <span className="stat-num">{likedCount}</span>
+              <span className="stat-num">
+                {gymsLoading ? '…' : gymsError ? '—' : likedCount}
+              </span>
               <span className="stat-label">{t('profile_stat_fav')}</span>
             </button>
             <div className="stat-divider" />
             <button type="button" className="stat-item stat-clickable" onClick={() => onNavigate?.('explore')}>
-              <span className="stat-num">{gymTotal}</span>
+              <span className="stat-num">
+                {gymsLoading ? '…' : gymsError ? '—' : gymTotal}
+              </span>
               <span className="stat-label">{t('profile_stat_gyms')}</span>
             </button>
             <div className="stat-divider" />

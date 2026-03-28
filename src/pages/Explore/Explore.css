@@ -379,6 +379,79 @@
 }
 .panel-empty p { font-size: 13px; font-weight: 600; margin: 0; }
 
+.panel-empty--error p {
+  color: #b91c1c;
+}
+
+.explore-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: none;
+  background: #0078ff;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.map-count-badge--muted {
+  color: #94a3b8;
+}
+
+.explore-panel-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.explore-skel-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 10px;
+}
+
+.explore-skel-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: explore-skel 1.2s ease-in-out infinite;
+}
+
+.explore-skel-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.explore-skel-line {
+  height: 10px;
+  border-radius: 5px;
+  width: 70%;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: explore-skel 1.2s ease-in-out infinite;
+}
+
+.explore-skel-line.short {
+  width: 45%;
+}
+
+@keyframes explore-skel {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 /* Gym card in panel */
 .panel-gym-card {
   display: flex;

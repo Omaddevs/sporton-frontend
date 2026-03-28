@@ -10,7 +10,14 @@ import './Home.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://sporton-api.onrender.com';
 
-export default function Home({ gyms, toggleLike, onNavigate }) {
+export default function Home({
+  gyms,
+  gymsLoading,
+  gymsError,
+  onRetryGyms,
+  toggleLike,
+  onNavigate,
+}) {
   const [showPostModal, setShowPostModal] = useState(false);
   const [promoBanners, setPromoBanners] = useState([]);
 
@@ -116,7 +123,15 @@ export default function Home({ gyms, toggleLike, onNavigate }) {
           }}
         />
         <PromoBannerCarousel banners={promoBanners} onNavigate={onNavigate} />
-        <GymList gyms={filteredGyms} toggleLike={toggleLike} onNavigate={onNavigate} />
+        <GymList
+          gyms={filteredGyms}
+          allLoadedCount={(gyms || []).length}
+          loading={gymsLoading}
+          error={gymsError}
+          onRetry={onRetryGyms}
+          toggleLike={toggleLike}
+          onNavigate={onNavigate}
+        />
         <div className="bottom-spacer" />
       </div>
 

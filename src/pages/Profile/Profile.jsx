@@ -1,7 +1,16 @@
 import AuthPage from './AuthPage';
 import ProfileView from './ProfileView';
 
-export default function Profile({ user, onLogin, onLogout, gyms, onNavigate, onUpdateProfile }) {
+export default function Profile({
+  user,
+  onLogin,
+  onLogout,
+  gyms,
+  gymsLoading,
+  gymsError,
+  onNavigate,
+  onUpdateProfile,
+}) {
   if (!user) {
     return <AuthPage onLogin={onLogin} />;
   }
@@ -10,6 +19,8 @@ export default function Profile({ user, onLogin, onLogout, gyms, onNavigate, onU
       user={user}
       onLogout={onLogout}
       gyms={gyms}
+      gymsLoading={gymsLoading}
+      gymsError={gymsError}
       onNavigate={onNavigate}
       onUpdateProfile={onUpdateProfile}
     />

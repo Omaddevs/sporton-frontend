@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import './i18n';
 import Home from './pages/Home';
 import Explore from './pages/Explore/Explore';
@@ -6,7 +6,6 @@ import Favorites from './pages/Favorites/Favorites';
 import Profile from './pages/Profile/Profile';
 import BottomNav from './components/BottomNav/BottomNav';
 import Header from './components/Header/Header';
-import { gyms as initialGyms } from './data/gyms';
 import { apiFetch } from './utils/api';
 import './App.css';
 
@@ -21,58 +20,47 @@ function loadUser() {
   catch { return null; }
 }
 
-function loadAccessToken() {
-  try { return localStorage.getItem('sporton_access_token'); }
-  catch { return null; }
-}
-
 export default function App() {
   const [activePage, setActivePage] = useState('home');
-  const [gyms, setGyms] = useState(initialGyms);
+  const [gyms, setGyms] = useState([]);
+  const [gymsLoading, setGymsLoading] = useState(true);
+  const [gymsError, setGymsError] = useState(null);
   const [user, setUser] = useState(loadUser);
 
-  // Load gyms from backend.
-  useEffect(() => {
-    const controller = new AbortController();
+  const loadGyms = useCallback(async (signal) => {
+    setGymsLoading(true);
+    setGymsError(null);
+    try {
+      const data = await apiFetch('/api/gyms/', signal ? { signal } : {});
+      const items = Array.isArray(data?.items)
+        ? data.items
+        : Array.isArray(data)
+          ? data
+          : [];
 
-    async function loadGyms() {
-      try {
-        const data = await apiFetch('/api/gyms/', {
-          signal: controller.signal,
-        });
-        const items = Array.isArray(data?.items)
-          ? data.items
-          : Array.isArray(data)
-            ? data
-            : [];
-
-        setGyms((prev) => {
-          if (!items.length) {
-            if (import.meta.env.DEV) {
-              console.warn(
-                '[SportON] /api/gyms/ bo‘sh — bazada zal yo‘q yoki javob noto‘g‘ri; demo ro‘yxat saqlanadi.'
-              );
-            }
-            return prev?.length ? prev : [];
-          }
-          const likedById = new Map((prev || []).map((g) => [g.id, g.liked]));
-          return items.map((g) => ({
-            ...g,
-            liked: g.liked ?? (likedById.get(g.id) ?? false),
-          }));
-        });
-      } catch (e) {
-        if (e?.name === 'AbortError') return;
-        // Keep initialGyms as fallback so UI still works.
-        console.error('Failed to load gyms from backend:', e);
+      setGyms((prev) => {
+        const likedById = new Map((prev || []).map((g) => [g.id, g.liked]));
+        return items.map((g) => ({
+          ...g,
+          liked: g.liked ?? (likedById.get(g.id) ?? false),
+        }));
+      });
+    } catch (e) {
+      if (e?.name === 'AbortError') return;
+      setGymsError(e?.message || "Ma'lumotlarni yuklashda xato");
+      setGyms([]);
+    } finally {
+      if (!signal || !signal.aborted) {
+        setGymsLoading(false);
       }
     }
-
-    loadGyms();
-    return () => {
-      controller.abort();
-    };
   }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    loadGyms(controller.signal);
+    return () => controller.abort();
+  }, [loadGyms]);
 
   const toggleLike = async (id) => {
     if (!user) {
@@ -80,23 +68,19 @@ export default function App() {
       return;
     }
 
-    // Optimistik yondashuv (UI'ni tezda o'zgartirish)
     setGyms((prev) =>
       prev.map((g) => (g.id === id ? { ...g, liked: !g.liked } : g))
     );
 
     try {
-      // Backendga bildirish
       const data = await apiFetch(`/api/gyms/${id}/like/`, {
         method: 'POST',
       });
-      // Backend aniq holatni qaytaradi: data.liked
       setGyms((prev) =>
         prev.map((g) => (g.id === id ? { ...g, liked: data.liked } : g))
       );
     } catch (e) {
       console.error('Like toggle failed:', e);
-      // Agar backendda xato bo'lsa, holatni orqaga qaytarish mumkin (ixtiyoriy)
       setGyms((prev) =>
         prev.map((g) => (g.id === id ? { ...g, liked: !g.liked } : g))
       );
@@ -138,9 +122,17 @@ export default function App() {
       ...(data?.user || {}),
     }));
 
-    // Keep localStorage in sync.
     const nextUser = data?.user;
     if (nextUser) localStorage.setItem('sporton_user', JSON.stringify(nextUser));
+  };
+
+  const gymsProps = {
+    gyms,
+    gymsLoading,
+    gymsError,
+    onRetryGyms: () => loadGyms(),
+    toggleLike,
+    onNavigate: setActivePage,
   };
 
   return (
@@ -157,19 +149,21 @@ export default function App() {
               flexDirection: 'column',
             }}
           >
-            <Explore gyms={gyms} toggleLike={toggleLike} onNavigate={setActivePage} />
+            <Explore {...gymsProps} />
           </div>
         </>
       ) : activePage === 'home' ? (
-        <Home gyms={gyms} toggleLike={toggleLike} onNavigate={setActivePage} />
+        <Home {...gymsProps} />
       ) : activePage === 'favorite' ? (
-        <Favorites gyms={gyms} toggleLike={toggleLike} onNavigate={setActivePage} />
+        <Favorites {...gymsProps} />
       ) : activePage === 'profile' ? (
         <Profile
           user={user}
           onLogin={handleLogin}
           onLogout={handleLogout}
           gyms={gyms}
+          gymsLoading={gymsLoading}
+          gymsError={gymsError}
           onNavigate={setActivePage}
           onUpdateProfile={handleUpdateProfile}
         />

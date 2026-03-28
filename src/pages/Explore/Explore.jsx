@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useTranslation } from 'react-i18next';
-import { Search, Star, MapPin, Clock, Phone, X, ChevronUp } from 'lucide-react';
+import { Search, Star, MapPin, Clock, X, ChevronUp, RefreshCw } from 'lucide-react';
 import GymDetail from '../../components/GymDetail/GymDetail';
 import { getGymImageUrl } from '../../utils/gymImageUrl';
 import './Explore.css';
@@ -65,8 +65,16 @@ function formatPrice(p) {
   return new Intl.NumberFormat('uz-UZ').format(p);
 }
 
-export default function Explore({ gyms = [], toggleLike, onNavigate }) {
+export default function Explore({
+  gyms,
+  gymsLoading,
+  gymsError,
+  onRetryGyms,
+  toggleLike,
+  onNavigate,
+}) {
   const { t } = useTranslation();
+  const list = Array.isArray(gyms) ? gyms : [];
   const [activeGym, setActiveGym] = useState(null);
   const [detailGym, setDetailGym] = useState(null);
   const [search, setSearch] = useState('');
@@ -75,7 +83,7 @@ export default function Explore({ gyms = [], toggleLike, onNavigate }) {
   const listRef = useRef(null);
 
   const q = search.toLowerCase();
-  const filtered = gyms.filter((g) => {
+  const filtered = list.filter((g) => {
     const name = (g.name || '').toLowerCase();
     const district = (g.district || '').toLowerCase();
     return name.includes(q) || district.includes(q);
@@ -113,7 +121,7 @@ export default function Explore({ gyms = [], toggleLike, onNavigate }) {
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
           />
 
-          {filtered.map((gym) => (
+          {!gymsLoading && !gymsError && filtered.map((gym) => (
             <Marker
               key={gym.id}
               position={[gym.lat, gym.lng]}
@@ -151,9 +159,9 @@ export default function Explore({ gyms = [], toggleLike, onNavigate }) {
         </MapContainer>
 
         {/* Map count badge */}
-        <div className="map-count-badge">
+        <div className={`map-count-badge ${gymsLoading || gymsError ? 'map-count-badge--muted' : ''}`}>
           <MapPin size={13} />
-          {filtered.length} ta sport zali
+          {gymsLoading ? '…' : gymsError ? '—' : `${filtered.length} ta sport zali`}
         </div>
       </div>
 
@@ -178,13 +186,41 @@ export default function Explore({ gyms = [], toggleLike, onNavigate }) {
 
         {/* List */}
         <div className="panel-list" ref={listRef}>
-          {filtered.length === 0 && (
-            <div className="panel-empty">
-              <MapPin size={32} opacity={0.3} />
-              <p>Sport zal topilmadi</p>
+          {gymsLoading && (
+            <div className="explore-panel-loading" aria-busy="true">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="explore-skel-row">
+                  <div className="explore-skel-thumb" />
+                  <div className="explore-skel-text">
+                    <div className="explore-skel-line" />
+                    <div className="explore-skel-line short" />
+                  </div>
+                </div>
+              ))}
             </div>
           )}
-          {filtered.map((gym) => {
+          {gymsError && (
+            <div className="panel-empty panel-empty--error">
+              <p>{gymsError}</p>
+              <button type="button" className="explore-retry-btn" onClick={() => onRetryGyms?.()}>
+                <RefreshCw size={14} />
+                {t('gyms_retry')}
+              </button>
+            </div>
+          )}
+          {!gymsLoading && !gymsError && list.length === 0 && (
+            <div className="panel-empty">
+              <MapPin size={32} opacity={0.3} />
+              <p>{t('gyms_empty')}</p>
+            </div>
+          )}
+          {!gymsLoading && !gymsError && list.length > 0 && filtered.length === 0 && (
+            <div className="panel-empty">
+              <MapPin size={32} opacity={0.3} />
+              <p>{t('gyms_filter_empty')}</p>
+            </div>
+          )}
+          {!gymsLoading && !gymsError && filtered.map((gym) => {
             const thumbSrc = brokenThumbs[gym.id] ? null : getGymImageUrl(gym);
             return (
             <div
@@ -253,7 +289,7 @@ export default function Explore({ gyms = [], toggleLike, onNavigate }) {
       {detailGym && (
         <GymDetail
           key={detailGym.id}
-          gym={gyms.find((g) => g.id === detailGym.id) || detailGym}
+          gym={list.find((g) => g.id === detailGym.id) || detailGym}
           onClose={() => setDetailGym(null)}
           onToggleLike={handleToggleLike}
           onRequireAuth={() => onNavigate?.('profile')}
