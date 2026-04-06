@@ -1,0 +1,421 @@
+/* src/pages/Research/ResearchProjects.css */
+.rp-page {
+     font-family: 'DM Sans', sans-serif;
+     color: #333;
+     padding-bottom: 80px;
+}
+
+.rp-hero {
+     position: relative;
+     height: 180px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     overflow: hidden;
+}
+
+.rp-hero-overlay {
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background: linear-gradient(rgba(26, 42, 75, 0.6), rgba(26, 42, 75, 0.9));
+     z-index: 2;
+}
+
+.rp-hero-video {
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+     z-index: 1;
+}
+
+.rp-title {
+     position: relative;
+     z-index: 3;
+     color: #fff;
+     font-size: 2.2rem;
+     font-weight: 500;
+     text-align: center;
+     margin: 0;
+     letter-spacing: 0.5px;
+}
+
+.rp-container {
+     max-width: 1920px;
+     margin: 40px auto;
+     padding: 0 20px;
+}
+
+/* Core Layout */
+.rp-main-content {
+     display: flex;
+     gap: 40px;
+     align-items: flex-start;
+}
+
+.rp-left-column {
+     flex: 1.3;
+}
+
+.rp-right-column {
+     flex: 1;
+     max-width: 550px;
+}
+
+.rp-section-title {
+     font-size: 1.5rem;
+     font-weight: 700;
+     color: #1e293b;
+     margin-top: 0;
+     margin-bottom: 24px;
+}
+
+/* Accordion Publications */
+.rp-accordion {
+     display: flex;
+     flex-direction: column;
+     gap: 16px;
+     margin-bottom: 40px;
+}
+
+.rp-accordion-item {
+     border: 1px solid #e2e8f0;
+     border-radius: 12px;
+     background: #fff;
+     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+     overflow: hidden;
+}
+
+.rp-accordion-header {
+     padding: 20px 24px;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     cursor: pointer;
+     user-select: none;
+     background: #fff;
+     transition: all 0.2s;
+}
+
+.rp-accordion-header:hover {
+     background: #f8fafc;
+}
+
+.rp-accordion-header h3 {
+     margin: 0;
+     font-size: 1.2rem;
+     color: #1e293b;
+     font-weight: 600;
+}
+
+.rp-accordion-icon {
+     font-size: 1.5rem;
+     color: #3b82f6;
+     transition: transform 0.3s ease;
+     display: flex;
+     align-items: center;
+     font-weight: 300;
+}
+
+.rp-accordion-item.open .rp-accordion-icon {
+     transform: rotate(45deg);
+}
+
+.rp-accordion-item.open .rp-accordion-header {
+     border-bottom: 1px solid #e2e8f0;
+     background: #f8fafc;
+}
+
+.rp-accordion-body {
+     display: grid;
+     grid-template-rows: 0fr;
+     transition: grid-template-rows 0.3s ease-out;
+}
+
+.rp-accordion-item.open .rp-accordion-body {
+     grid-template-rows: 1fr;
+}
+
+.rp-accordion-body-inner {
+     overflow: hidden;
+     background: #fff;
+}
+
+.rp-publications-list {
+     padding: 24px;
+     display: flex;
+     flex-direction: column;
+     gap: 16px;
+     margin: 0;
+}
+
+.rp-publication-item {
+     background: #f8fafc;
+     padding: 20px;
+     border-radius: 10px;
+     font-size: 1rem;
+     line-height: 1.6;
+     color: #334155;
+     border-left: 4px solid #3b82f6;
+}
+
+.rp-publication-item a {
+     color: #3b82f6;
+     text-decoration: none;
+     word-break: break-word;
+     font-weight: 500;
+}
+
+.rp-publication-item a:hover {
+     text-decoration: underline;
+}
+
+/* Cards Grid */
+.rp-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+     gap: 30px;
+     margin-bottom: 40px;
+}
+
+.rp-card {
+     background: #f1f5f9;
+     border-radius: 12px;
+     overflow: hidden;
+     display: flex;
+     flex-direction: column;
+}
+
+.rp-img-box {
+     position: relative;
+     height: 160px;
+     width: 100%;
+}
+
+.rp-img-box img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+}
+
+.rp-strip {
+     position: absolute;
+     bottom: 0;
+     left: 0;
+     width: 100%;
+     height: 6px;
+}
+
+.rp-strip.blue {
+     background: #3b82f6;
+     /* Adjust color matches screen */
+}
+
+.rp-card-content {
+     padding: 24px;
+     display: flex;
+     flex-direction: column;
+     flex: 1;
+}
+
+.rp-card-title {
+     font-size: 1.1rem;
+     font-weight: 700;
+     color: #1e293b;
+     margin: 0;
+     margin-bottom: 24px;
+}
+
+.rp-divider {
+     border: none;
+     border-top: 1px solid #cbd5e1;
+     margin: auto 0 16px 0;
+}
+
+.rp-link {
+     background: none;
+     border: none;
+     color: #3b82f6;
+     padding: 0;
+     font-size: 0.95rem;
+     font-weight: 500;
+     cursor: pointer;
+     display: inline-flex;
+     align-items: center;
+}
+
+/* Applications Box */
+.rp-applications-box {
+     background: #fff;
+     border: 1px solid #f1f5f9;
+     border-radius: 12px;
+     padding: 30px 40px;
+     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+     display: flex;
+     flex-direction: column;
+     align-items: flex-start;
+     gap: 16px;
+}
+
+.rp-applications-box h3 {
+     font-size: 1.25rem;
+     font-weight: 700;
+     color: #1e293b;
+     margin: 0;
+}
+
+.rp-apply-btn {
+     background-color: #38b2ac;
+     color: white;
+     border: none;
+     padding: 12px 24px;
+     border-radius: 8px;
+     font-size: 1rem;
+     font-weight: 500;
+     cursor: pointer;
+     transition: background-color 0.2s;
+     display: inline-flex;
+     align-items: center;
+     gap: 8px;
+}
+
+.rp-apply-btn:hover {
+     background-color: #319795;
+}
+
+@media (max-width: 768px) {
+     .rp-tabs {
+          width: 100%;
+     }
+
+     .rp-grid {
+          grid-template-columns: 1fr;
+     }
+
+     .rp-applications-box {
+          padding: 24px;
+     }
+
+     .rp-modal-content {
+          width: 95%;
+          padding: 24px;
+     }
+}
+
+/* Modal Styles */
+.rp-modal-overlay {
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background: rgba(0, 0, 0, 0.6);
+     backdrop-filter: blur(5px);
+     z-index: 999999;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     opacity: 0;
+     animation: rpFadeIn 0.3s forwards ease-in-out;
+}
+
+@keyframes rpFadeIn {
+     to { opacity: 1; }
+}
+
+.rp-modal-content {
+     background: #fff;
+     width: 600px;
+     max-width: 90%;
+     max-height: 90vh;
+     overflow-y: auto;
+     border-radius: 16px;
+     padding: 32px;
+     position: relative;
+     box-shadow: 0 24px 50px rgba(0, 0, 0, 0.3);
+     transform: translateY(30px);
+     animation: rpSlideUp 0.3s forwards ease-out;
+}
+
+@keyframes rpSlideUp {
+     to { transform: translateY(0); }
+}
+
+.rp-modal-close {
+     position: absolute;
+     top: 20px;
+     right: 20px;
+     background: #f1f5f9;
+     border: none;
+     width: 36px;
+     height: 36px;
+     border-radius: 50%;
+     font-size: 20px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     cursor: pointer;
+     color: #475569;
+     transition: all 0.2s;
+}
+
+.rp-modal-close:hover {
+     background: #e2e8f0;
+     color: #0f172a;
+}
+
+.rp-modal-img {
+     width: 100%;
+     height: 240px;
+     object-fit: cover;
+     border-radius: 12px;
+     margin-bottom: 24px;
+}
+
+.rp-modal-title {
+     font-size: 1.6rem;
+     font-weight: 700;
+     margin: 0 0 12px 0;
+     color: #0f172a;
+}
+
+.rp-modal-desc {
+     font-size: 1rem;
+     line-height: 1.6;
+     color: #475569;
+}
+
+.rp-project-details h4 {
+     font-size: 1.2rem;
+     color: #1e293b;
+     margin-bottom: 20px;
+}
+
+.rp-project-details p {
+     margin-bottom: 12px;
+}
+
+.rp-project-details ul,
+.rp-project-details ol {
+     margin-top: 0;
+     margin-bottom: 20px;
+     padding-left: 24px;
+}
+
+.rp-project-details li {
+     margin-bottom: 6px;
+}
+
+.rp-project-details a {
+     color: #3b82f6;
+     text-decoration: none;
+}
+
+.rp-project-details a:hover {
+     text-decoration: underline;
+}

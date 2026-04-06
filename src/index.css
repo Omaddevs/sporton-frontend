@@ -1,0 +1,33 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Google Sans', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f5f9ff;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/*
+ * iOS Safari: computed font-size < 16px on focused text fields triggers automatic page zoom.
+ * Keep all text-like inputs, textareas, and selects at least 16px (also helps Android Chrome).
+ */
+textarea,
+select,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="image"]):not([type="hidden"]) {
+  font-family: inherit;
+  font-size: 16px;
+}

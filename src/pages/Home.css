@@ -1,0 +1,62 @@
+.home-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;           /* ← critical: lets flex child shrink & scroll */
+  background: #f5f9ff;
+  overflow: hidden;
+  position: relative;
+}
+
+/* iOS-style surface sheet around scroll content */
+/* The actual scrolling container */
+.home-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* Center content on wide screens */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inner max-width wrapper inside scroll */
+.home-scroll > * {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.bottom-spacer {
+  height: 90px;          /* space for fixed bottom nav */
+  flex-shrink: 0;
+}
+
+/* Floating Action Button */
+.fab-btn {
+  position: fixed;
+  bottom: 88px;
+  right: max(24px, calc(50vw - 576px));
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #96E20C, #7bc400);
+  color: #1a2e00;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(150, 226, 12, 0.5);
+  z-index: 99;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+}
+
+.fab-btn:hover {
+  transform: scale(1.12) rotate(90deg);
+  box-shadow: 0 10px 28px rgba(150, 226, 12, 0.6);
+}
+
+.fab-btn:active { transform: scale(0.95); }

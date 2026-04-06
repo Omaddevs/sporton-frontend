@@ -1,0 +1,397 @@
+.gym-section {
+  padding: 20px 24px 12px;
+}
+
+/* Loading / error / empty */
+.gym-list-state {
+  padding: 36px 20px;
+  text-align: center;
+  border-radius: 20px;
+  background: #f8fafc;
+  border: 1.5px dashed #e2e8f0;
+  margin-top: 4px;
+}
+
+.gym-list-state--error {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.gym-list-state-text {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.gym-list-state--error .gym-list-state-text {
+  color: #b91c1c;
+}
+
+.gym-list-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 14px;
+  border: none;
+  background: #0078ff;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.gym-list-retry-btn:hover {
+  background: #0060d0;
+}
+
+.gym-grid-skeleton {
+  margin-top: 4px;
+}
+
+.gym-card-skeleton {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1.5px solid #f1f5f9;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.gym-skel-visual {
+  height: 140px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: gym-skel-shimmer 1.2s ease-in-out infinite;
+}
+
+.gym-skel-body {
+  padding: 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gym-skel-line {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: gym-skel-shimmer 1.2s ease-in-out infinite;
+}
+
+.gym-skel-line--lg { width: 85%; }
+.gym-skel-line--md { width: 60%; }
+.gym-skel-line--sm { width: 95%; }
+
+@keyframes gym-skel-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.see-all-btn {
+  background: #f4fde0;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4a7000;
+  cursor: pointer;
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-family: inherit;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.see-all-btn:hover {
+  background: #96E20C;
+  color: #1a2e00;
+  transform: scale(1.04);
+}
+
+/* ── Grid ── */
+.gym-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .gym-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 960px) {
+  .gym-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ── Card ── */
+.gym-card {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  cursor: pointer;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.22s ease;
+  border: 1.5px solid #f1f5f9;
+}
+
+.gym-card:hover {
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  border-color: transparent;
+}
+
+.gym-card:active {
+  transform: scale(0.97);
+}
+
+/* Visual top */
+.gym-card-visual {
+  position: relative;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .gym-card-visual { height: 160px; }
+}
+
+.gym-card-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  opacity: 0.95;
+}
+
+.gym-visual-icon {
+  opacity: 0.6;
+  z-index: 1;
+}
+
+.gym-visual-icon svg {
+  width: 80px;
+  height: 80px;
+}
+
+.gym-heart-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  transition: transform 0.18s, background 0.18s, box-shadow 0.18s;
+}
+
+.gym-heart-btn:hover {
+  transform: scale(1.15);
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+}
+
+.gym-heart-btn.liked {
+  background: #fff0f0;
+  border-color: #fecaca;
+}
+
+.gym-card-badges {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.gym-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+  font-family: inherit;
+}
+
+.gym-visual-stats-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 9px;
+  border-radius: 20px;
+  background: rgba(244, 253, 224, 0.92);
+  color: #1a2e00;
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+}
+
+.gym-visual-stats-rating {
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.gym-visual-stats-reviews {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 900;
+}
+
+.gym-status-badge.open {
+  background: rgba(150, 226, 12, 0.92);
+  color: #1a2e00;
+}
+
+.gym-status-badge.closed {
+  background: rgba(255, 91, 91, 0.88);
+  color: #fff;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.gym-status-badge.open  .status-dot { background: #2d6a00; }
+.gym-status-badge.closed .status-dot { background: #fff; }
+
+/* Info */
+.gym-card-info {
+  padding: 12px 14px 14px;
+}
+
+.gym-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.gym-card-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.25;
+  flex: 1;
+}
+
+.gym-card-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+  flex-shrink: 0;
+  background: #f4fde0;
+  padding: 3px 7px;
+  border-radius: 10px;
+}
+
+.gym-card-reviews {
+  font-weight: 800;
+  color: #64748b;
+}
+
+.gym-card-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.gym-card-address {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
+  line-height: 1.25;
+}
+
+.loc-icon {
+  color: #0078FF;
+  flex-shrink: 0;
+}
+
+/* .gym-card-desc removed from UI in this version */
+
+.gym-card-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  column-gap: 14px;
+  row-gap: 6px;
+}
+
+.gym-card-price {
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+}
+
+.price-amount {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0078FF;
+}
+
+.price-unit {
+  font-size: 10px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.gym-card-hours {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #9ca3af;
+  font-weight: 500;
+  flex-shrink: 0;
+}
